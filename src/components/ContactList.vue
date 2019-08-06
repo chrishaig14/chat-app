@@ -1,5 +1,11 @@
 <template>
   <div id="contact-list">
+    <div>
+      <form @submit.prevent="$emit('add:contact',newContact)">
+        <label>New contact:<input type="text" v-model="newContact"></label>
+        <button>Add</button>
+      </form>
+    </div>
     <div class="contact" v-for="user in contacts" :key="user"
          @click="$emit('open:chat',user)">
       {{user}}
@@ -12,7 +18,9 @@
 export default {
   name: 'ContactList',
   data () {
-    return {}
+    return {
+      newContact: ''
+    }
   },
   props: {
     contacts: Array

@@ -11,7 +11,8 @@
       <signup @new:user="newUser"></signup>
       <p v-for="user in users" :key="user.user">{{user.user}}</p>
       <login/>
-      <contact-list :contacts='contacts' @open:chat="openChat"></contact-list>
+      <contact-list :contacts='contacts' @open:chat="openChat"
+                    @add:contact="addContact"></contact-list>
     </div>
     <chat-view :messages='messages'/>
   </div>
@@ -40,6 +41,9 @@ export default {
     },
     openChat (id) {
 
+    },
+    addContact (id) {
+      this.contacts.push(id)
     }
   }
 }

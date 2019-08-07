@@ -2,7 +2,7 @@
   <div id="chat-view">
     <p class="msg" v-for="msg in messages">{{msg}}</p>
     <form @submit.prevent="handleSubmit">
-      <label>Message:<input type="text"></label>
+      <label>Message:<input type="text" v-model="message"></label>
       <button>Send!</button>
     </form>
   </div>
@@ -11,12 +11,17 @@
 <script>
 export default {
   name: 'ChatView',
+  data () {
+    return {
+      message: ''
+    }
+  },
   props: {
     messages: Array
   },
   methods: {
     handleSubmit () {
-
+      this.$emit('send:message', this.message)
     }
   }
 }

@@ -10,7 +10,7 @@
     <div>
       <signup @new:user="newUser"></signup>
       <p v-for="user in users" :key="user.user">{{user.user}}</p>
-      <login/>
+      <login @login="login"/>
       <contact-list :contacts='contacts' @open:chat="openChat"
                     @add:contact="addContact"></contact-list>
     </div>
@@ -23,6 +23,7 @@ import ContactList from '@/components/ContactList'
 import Signup from '@/components/Signup'
 import Login from '@/components/Login'
 import ChatView from '@/components/ChatView'
+import io from 'socket.io-client'
 
 export default {
   name: 'App',
@@ -31,19 +32,25 @@ export default {
     return {
       users: [],
       messages: ['hello, my friend!', 'hi pal, howdy?', 'fine, u?', 'oh great! u free next friday?', 'sure man, where do u wanna go?', 'how bout mcdonalds?', 'cool, see you there at 8pm', 'sure man, see ya'],
-      contacts: ['chris', 'alex', 'john', 'amy', 'rachel']
+      contacts: ['chris', 'alex', 'john', 'amy', 'rachel'],
+      socket: io('localhost:3000')
     }
   },
   methods: {
     newUser (user) {
       console.log('ADDED NEW USER')
+      this.socket.emit('new:user', user)
       this.users.push({user: user})
     },
     openChat (id) {
 
     },
     addContact (id) {
-      this.contacts.push(id)
+      // this.contacts.push(id)
+      this.socket.emit('add:contact', id)
+    },
+    login (id) {
+      this.socket.emit('login', id)
     }
   }
 }

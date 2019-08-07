@@ -2,16 +2,18 @@
   <div id="app">
     <div>
       <signup @new:user="newUser"></signup>
-      <p v-for="user in users" :key="user.user">{{user.user}}</p>
+      <!--      <p v-for="user in users" :key="user.user">{{user.user}}</p>-->
       <login @login="login"/>
       <p>Current user: <span style="font-weight: bold">{{currentUser}}</span>
       </p>
       <contact-list :contacts='contacts' @open:chat="openChat"
                     @add:contact="addContact"></contact-list>
     </div>
-    <chat-view @reset:new="newMessages=false" class="chat-view"
+    <chat-view @reset:new="chats[currentChat].newMessages = false"
+               class="chat-view"
                @send:message="sendMessage"
-               :messages='currentChat' :new="newMessages"/>
+               :messages='chats[currentChat].messages'
+               :new="chats[currentChat].newMessages"/>
   </div>
 </template>
 
@@ -28,26 +30,26 @@ export default {
   data () {
     return {
       currentUser: '',
-      users: [],
       messages: [],
       contacts: [],
-      chats: {},
-      currentUserChat: '',
-      currentChat: [],
-      socket: io('localhost:3000'),
-      newMessages: false
+      chats: {'': {messages: [], newMessages: ''}},
+      currentChat: '',
+      socket: io('localhost:3000')
     }
   },
   methods: {
     newUser (user) {
-      console.log('ADDED NEW USER')
+      console.log('ADDED aNEW USER')
       this.socket.emit('new:user', user)
-      this.users.push({user: user})
     },
     openChat (id) {
       console.log('OPENING CHAT WITH USER: ', id)
-      this.currentChat = []
-      this.currentUserChat = id
+      this.currentChat = id
+      let chatObj = {}
+      chatObj[id] = {messages: [], newMessages: false}
+      this.chats = Object.assign({}, this.chats, chatObj)
+      // this.chats[id] = {messages: [], newMessages: false}
+      // this.currentUserChat = id
       this.socket.emit('get:chat', id)
     },
     addContact (id) {
@@ -63,7 +65,7 @@ export default {
     },
     sendMessage (m) {
       this.socket.emit('send:message', {
-        contact: this.currentUserChat,
+        contact: this.currentChat,
         message: m
       })
     }
@@ -81,15 +83,25 @@ export default {
       console.log('RECEIVED CONTACTS:', m)
     })
     this.socket.on('chat', (m) => {
-      this.chats[m.user] = m
-      this.currentChat = m.messages
-      console.log('RECEIVED CHAT: ', typeof (m))
+      // this.chats[m.user] = m
+      console.log('RECEIVED CHAT: ', m)
+
+      this.chats[m.contact].messages = m.messages
+      this.chats[m.contact].newMessages = true
+      let c = this.chats[this.currentChat].messages
+      console.log('current chat messages', c)
     })
     this.socket.on('new:message', (m) => {
       console.log('RECEIVED NEW MESSAGE: ', m)
-      this.currentChat.push(m)
-      this.newMessages = true
+      this.chats[m.contact].messages.push(m.message)
+      this.chats[m.contact].newMessages = true
+      // this.currentChat.push(m.message)
+      // this.newMessages = true
     })
+  },
+  updated () {
+    let c = this.chats[this.currentChat].messages
+    console.log('current chat messages', c)
   }
 }
 </script>

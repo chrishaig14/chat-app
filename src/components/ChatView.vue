@@ -1,7 +1,7 @@
 <template>
   <div id="chat-view">
     <div ref="msglist" class="messages">
-      <p class="msg" :key="msg" v-for="msg in messages">{{msg}}</p>
+      <p class="msg" :key="msg.id" v-for="msg in messages">{{msg}}</p>
     </div>
     <form @submit.prevent="handleSubmit">
       <label>Message:<input type="text" v-model="message"></label>
@@ -22,14 +22,14 @@ export default {
     messages: Array,
     new: Boolean
   },
-  watch: {
-    new: function (val) {
-      if (val) {
-        console.log('NEW MESSAGES!')
-        this.$emit('reset:new')
-      }
-    }
-  },
+  // watch: {
+  //   new: function (val) {
+  //     if (val) {
+  //       console.log('NEW MESSAGES!')
+  //       this.$emit('reset:new')
+  //     }
+  //   }
+  // },
   methods: {
     handleSubmit () {
       this.$emit('send:message', this.message)
@@ -39,6 +39,7 @@ export default {
     console.log('this.messages:', this.messages)
   },
   updated () {
+    console.log('MY PROPS ARE:', this.new, this.messages)
     this.$refs.msglist.scrollTop = this.$refs.msglist.scrollHeight
   }
 }

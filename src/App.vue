@@ -100,6 +100,7 @@ export default {
   #app {
     display: flex;
     flex-direction: row;
+    height: 100%;
   }
 
   button, input {

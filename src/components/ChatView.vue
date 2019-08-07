@@ -32,6 +32,9 @@ export default {
 <style scoped>
   #chat-view {
     background-color: lightgray;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
   }
 
   input {
@@ -43,6 +46,7 @@ export default {
     flex-direction: column;
     /*align-content: center;*/
     align-items: center;
+    overflow-y: auto;
   }
   .msg {
     border-radius: 1.5rem;

@@ -14,7 +14,7 @@
       <contact-list :contacts='contacts' @open:chat="openChat"
                     @add:contact="addContact"></contact-list>
     </div>
-    <chat-view :messages='messages'/>
+    <chat-view :messages='currentChat !== ""?chats[currentChat].messages:[]'/>
   </div>
 </template>
 
@@ -34,6 +34,8 @@ export default {
       users: [],
       messages: ['hello, my friend!', 'hi pal, howdy?', 'fine, u?', 'oh great! u free next friday?', 'sure man, where do u wanna go?', 'how bout mcdonalds?', 'cool, see you there at 8pm', 'sure man, see ya'],
       contacts: [],
+      chats: {},
+      currentChat: '',
       socket: io('localhost:3000')
     }
   },
@@ -44,7 +46,9 @@ export default {
       this.users.push({user: user})
     },
     openChat (id) {
-
+      console.log('OPENING CHAT WITH USER: ', id)
+      this.currentChat = id
+      this.socket.emit('get:chat', id)
     },
     addContact (id) {
       // this.contacts.push(id)
@@ -69,6 +73,10 @@ export default {
     this.socket.on('contacts', (m) => {
       this.contacts = m.contacts
       console.log('RECEIVED CONTACTS:', m)
+    })
+    this.socket.on('chat', (m) => {
+      this.chats[m.user] = m
+      console.log('RECEIVED CHAT: ', m)
     })
   }
 }

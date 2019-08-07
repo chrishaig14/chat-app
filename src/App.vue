@@ -1,12 +1,5 @@
 <template>
   <div id="app">
-    <!--    <img src="./assets/logo.png">-->
-    <!--    &lt;!&ndash;    <router-view/>&ndash;&gt;-->
-    <!--    <h1>Employees</h1>-->
-    <!--    <employee-form @add:employee="addEmployee"-->
-    <!--    />-->
-    <!--    <employee-table :employees="employees" @edit:employee="editEmployee"-->
-    <!--                    @delete:employee="deleteEmployee"/>-->
     <div>
       <signup @new:user="newUser"></signup>
       <p v-for="user in users" :key="user.user">{{user.user}}</p>

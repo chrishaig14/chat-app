@@ -9,86 +9,89 @@
       <contact-list :contacts='contacts' @open:chat="openChat"
                     @add:contact="addContact"></contact-list>
     </div>
-    <chat-view class="chat-view" @send:message="sendMessage"
-               :messages='currentChat'/>
+    <chat-view @reset:new="newMessages=false" class="chat-view"
+               @send:message="sendMessage"
+               :messages='currentChat' :new="newMessages"/>
   </div>
 </template>
 
 <script>
-  import ContactList from '@/components/ContactList'
-  import Signup from '@/components/Signup'
-  import Login from '@/components/Login'
-  import ChatView from '@/components/ChatView'
-  import io from 'socket.io-client'
+import ContactList from '@/components/ContactList'
+import Signup from '@/components/Signup'
+import Login from '@/components/Login'
+import ChatView from '@/components/ChatView'
+import io from 'socket.io-client'
 
-  export default {
-    name: 'App',
-    components: {ChatView, Login, Signup, ContactList},
-    data () {
-      return {
-        currentUser: '',
-        users: [],
-        messages: [],
-        contacts: [],
-        chats: {},
-        currentUserChat: '',
-        currentChat: [],
-        socket: io('localhost:3000')
-      }
+export default {
+  name: 'App',
+  components: {ChatView, Login, Signup, ContactList},
+  data () {
+    return {
+      currentUser: '',
+      users: [],
+      messages: [],
+      contacts: [],
+      chats: {},
+      currentUserChat: '',
+      currentChat: [],
+      socket: io('localhost:3000'),
+      newMessages: false
+    }
+  },
+  methods: {
+    newUser (user) {
+      console.log('ADDED NEW USER')
+      this.socket.emit('new:user', user)
+      this.users.push({user: user})
     },
-    methods: {
-      newUser (user) {
-        console.log('ADDED NEW USER')
-        this.socket.emit('new:user', user)
-        this.users.push({user: user})
-      },
-      openChat (id) {
-        console.log('OPENING CHAT WITH USER: ', id)
-        this.currentChat = []
-        this.currentUserChat = id
-        this.socket.emit('get:chat', id)
-      },
-      addContact (id) {
-        // this.contacts.push(id)
-        this.socket.emit('add:contact', id)
-      },
-      login (id) {
-        this.socket.emit('login', id)
-        this.currentUser = id
-      },
-      getContacts () {
-        this.socket.emit('get:contacts')
-      },
-      sendMessage (m) {
-        this.socket.emit('send:message', {
-          contact: this.currentUserChat,
-          message: m
-        })
-      }
+    openChat (id) {
+      console.log('OPENING CHAT WITH USER: ', id)
+      this.currentChat = []
+      this.currentUserChat = id
+      this.socket.emit('get:chat', id)
     },
-    mounted () {
-      this.socket.on('login:ok', () => {
-        console.log('LOGGED IN OK')
-        this.socket.emit('get:contacts')
-      })
-      this.socket.on('login:error', () => {
-        console.log('THERE WAS AN ERROR LOGGING IN')
-      })
-      this.socket.on('contacts', (m) => {
-        this.contacts = m.contacts
-        console.log('RECEIVED CONTACTS:', m)
-      })
-      this.socket.on('chat', (m) => {
-        this.chats[m.user] = m
-        this.currentChat = m.messages
-        console.log('RECEIVED CHAT: ', typeof (m))
-      })
-      this.socket.on('new:message', (m) => {
-        console.log('RECEIVED NEW MESSAGE: ', m)
-        this.currentChat.push(m)
+    addContact (id) {
+      // this.contacts.push(id)
+      this.socket.emit('add:contact', id)
+    },
+    login (id) {
+      this.socket.emit('login', id)
+      this.currentUser = id
+    },
+    getContacts () {
+      this.socket.emit('get:contacts')
+    },
+    sendMessage (m) {
+      this.socket.emit('send:message', {
+        contact: this.currentUserChat,
+        message: m
       })
     }
+  },
+  mounted () {
+    this.socket.on('login:ok', () => {
+      console.log('LOGGED IN OK')
+      this.socket.emit('get:contacts')
+    })
+    this.socket.on('login:error', () => {
+      console.log('THERE WAS AN ERROR LOGGING IN')
+    })
+    this.socket.on('contacts', (m) => {
+      this.contacts = m.contacts
+      console.log('RECEIVED CONTACTS:', m)
+    })
+    this.socket.on('chat', (m) => {
+      this.chats[m.user] = m
+      this.currentChat = m.messages
+      console.log('RECEIVED CHAT: ', typeof (m))
+    })
+    this.socket.on('new:message', (m) => {
+      console.log('RECEIVED NEW MESSAGE: ', m)
+      this.currentChat.push(m)
+      this.newMessages = true
+    })
   }
+}
 </script>
 
 <style>

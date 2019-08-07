@@ -1,6 +1,6 @@
 <template>
   <div id="chat-view">
-    <div class="messages">
+    <div ref="msglist" class="messages">
       <p class="msg" :key="msg" v-for="msg in messages">{{msg}}</p>
     </div>
     <form @submit.prevent="handleSubmit">
@@ -19,12 +19,27 @@ export default {
     }
   },
   props: {
-    messages: Array
+    messages: Array,
+    new: Boolean
+  },
+  watch: {
+    new: function (val) {
+      if (val) {
+        console.log('NEW MESSAGES!')
+        this.$emit('reset:new')
+      }
+    }
   },
   methods: {
     handleSubmit () {
       this.$emit('send:message', this.message)
     }
+  },
+  mounted () {
+    console.log('this.messages:', this.messages)
+  },
+  updated () {
+    this.$refs.msglist.scrollTop = this.$refs.msglist.scrollHeight
   }
 }
 </script>
@@ -49,6 +64,7 @@ export default {
     overflow-y: auto;
     flex-grow: 1;
   }
+
   .msg {
     border-radius: 1.5rem;
     background-color: lightgreen;

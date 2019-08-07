@@ -30,9 +30,10 @@ export default {
   components: {ChatView, Login, Signup, ContactList},
   data () {
     return {
+      currentUser: '',
       users: [],
       messages: ['hello, my friend!', 'hi pal, howdy?', 'fine, u?', 'oh great! u free next friday?', 'sure man, where do u wanna go?', 'how bout mcdonalds?', 'cool, see you there at 8pm', 'sure man, see ya'],
-      contacts: ['chris', 'alex', 'john', 'amy', 'rachel'],
+      contacts: [],
       socket: io('localhost:3000')
     }
   },
@@ -51,7 +52,19 @@ export default {
     },
     login (id) {
       this.socket.emit('login', id)
+      this.currentUser = id
+    },
+    getContacts () {
+      this.socket.emit('get:contacts')
     }
+  },
+  mounted () {
+    this.socket.on('login:ok', () => {
+      console.log('LOGGED IN OK')
+    })
+    this.socket.on('login:error', () => {
+      console.log('THERE WAS AN ERROR LOGGING IN')
+    })
   }
 }
 </script>

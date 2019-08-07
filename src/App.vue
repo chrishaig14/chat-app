@@ -61,9 +61,14 @@ export default {
   mounted () {
     this.socket.on('login:ok', () => {
       console.log('LOGGED IN OK')
+      this.socket.emit('get:contacts')
     })
     this.socket.on('login:error', () => {
       console.log('THERE WAS AN ERROR LOGGING IN')
+    })
+    this.socket.on('contacts', (m) => {
+      this.contacts = m.contacts
+      console.log('RECEIVED CONTACTS:', m)
     })
   }
 }

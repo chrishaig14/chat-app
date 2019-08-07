@@ -14,7 +14,7 @@
       <contact-list :contacts='contacts' @open:chat="openChat"
                     @add:contact="addContact"></contact-list>
     </div>
-    <chat-view @send:message="sendMessage"
+    <chat-view class="chat-view" @send:message="sendMessage"
                :messages='currentChat'/>
   </div>
 </template>
@@ -94,13 +94,28 @@ export default {
 
 <style>
   #app {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
-    margin-top: 60px;
     display: flex;
     flex-direction: row;
+  }
+
+  button, input {
+    outline: none;
+  }
+
+  button {
+    border-radius: 1.5rem;
+    border: solid 1px gray;
+    padding: 0.5rem;
+    background-color: greenyellow;
+  }
+
+  button:hover {
+    background-color: lightgreen;
+  }
+
+  input[type="text"] {
+    border-radius: 1.5rem;
+    padding: 0.5rem;
+    border: solid 1px gray;
   }
 </style>

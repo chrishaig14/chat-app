@@ -1,6 +1,8 @@
 <template>
   <div id="chat-view">
-    <p class="msg" v-for="msg in messages">{{msg}}</p>
+    <div class="messages">
+      <p class="msg" v-for="msg in messages">{{msg}}</p>
+    </div>
     <form @submit.prevent="handleSubmit">
       <label>Message:<input type="text" v-model="message"></label>
       <button>Send!</button>
@@ -36,9 +38,18 @@ export default {
     background-color: white
   }
 
+  .messages {
+    display: flex;
+    flex-direction: column;
+    /*align-content: center;*/
+    align-items: center;
+  }
   .msg {
-    border-radius: 5px;
+    border-radius: 1.5rem;
     background-color: lightgreen;
+    padding: 0.5rem;
+    border: solid 1px green;
+    text-align: center;
   }
 
   form {

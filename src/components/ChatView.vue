@@ -47,6 +47,7 @@ export default {
     /*align-content: center;*/
     align-items: center;
     overflow-y: auto;
+    flex-grow: 1;
   }
   .msg {
     border-radius: 1.5rem;

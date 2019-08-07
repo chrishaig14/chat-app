@@ -26,7 +26,7 @@ export default {
     return {
       currentUser: '',
       users: [],
-      messages: ['hello, my friend!', 'hi pal, howdy?', 'fine, u?', 'oh great! u free next friday?', 'sure man, where do u wanna go?', 'how bout mcdonalds?', 'cool, see you there at 8pm', 'sure man, see ya'],
+      messages: [],
       contacts: [],
       chats: {},
       currentUserChat: '',

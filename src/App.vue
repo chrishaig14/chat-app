@@ -7,7 +7,7 @@
       <p>Current user: <span style="font-weight: bold">{{currentUser}}</span>
       </p>
       <contact-list :contacts='contacts' @open:chat="openChat"
-                    @add:contact="addContact"></contact-list>
+                    @add:contact="addContact" :chats="chats"></contact-list>
     </div>
     <chat-view @reset:new="chats[currentChat].newMessages = false"
                class="chat-view"
@@ -34,7 +34,8 @@ export default {
       contacts: [],
       chats: {'': {messages: [], newMessages: ''}},
       currentChat: '',
-      socket: io('localhost:3000')
+      socket: io('localhost:3000'),
+      newMessages: {}
     }
   },
   methods: {
@@ -45,9 +46,7 @@ export default {
     openChat (id) {
       console.log('OPENING CHAT WITH USER: ', id)
       this.currentChat = id
-      let chatObj = {}
-      chatObj[id] = {messages: [], newMessages: false}
-      this.chats = Object.assign({}, this.chats, chatObj)
+
       // this.chats[id] = {messages: [], newMessages: false}
       // this.currentUserChat = id
       this.socket.emit('get:chat', id)
@@ -80,6 +79,12 @@ export default {
     })
     this.socket.on('contacts', (m) => {
       this.contacts = m.contacts
+      for (let id of m.contacts) {
+        let chatObj = {}
+        chatObj[id] = {messages: [], newMessages: false}
+        this.chats = Object.assign({}, this.chats, chatObj)
+        console.log('ADDED CONTACT: ', this.chats)
+      }
       console.log('RECEIVED CONTACTS:', m)
     })
     this.socket.on('chat', (m) => {

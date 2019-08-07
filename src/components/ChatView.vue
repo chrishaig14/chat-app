@@ -22,14 +22,14 @@ export default {
     messages: Array,
     new: Boolean
   },
-  // watch: {
-  //   new: function (val) {
-  //     if (val) {
-  //       console.log('NEW MESSAGES!')
-  //       this.$emit('reset:new')
-  //     }
-  //   }
-  // },
+  watch: {
+    new: function (val) {
+      if (val) {
+        console.log('NEW MESSAGES!')
+        this.$emit('reset:new')
+      }
+    }
+  },
   methods: {
     handleSubmit () {
       this.$emit('send:message', this.message)

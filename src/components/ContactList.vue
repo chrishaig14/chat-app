@@ -27,7 +27,7 @@ export default {
   },
   props: {
     contacts: Array
-  },
+  }
 }
 </script>
 

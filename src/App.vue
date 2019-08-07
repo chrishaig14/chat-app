@@ -88,6 +88,10 @@ export default {
       this.currentChat = m.messages
       console.log('RECEIVED CHAT: ', typeof (m))
     })
+    this.socket.on('new:message', (m) => {
+      console.log('RECEIVED NEW MESSAGE: ', m)
+      this.currentChat.push(m)
+    })
   }
 }
 </script>

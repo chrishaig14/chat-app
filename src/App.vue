@@ -156,13 +156,20 @@ export default {
 
   button {
     border-radius: 1.5rem;
-    border: solid 1px gray;
+    /*border: solid 1px gray;*/
+    border: none;
+    box-shadow: gray 0 2px 3px 0;
     padding: 0.5rem;
     background-color: greenyellow;
   }
 
   button:hover {
     background-color: lightgreen;
+    box-shadow: gray 0 2px 3px 0;
+  }
+
+  button:active {
+    box-shadow: none;
   }
 
   .chat-item {

@@ -8,6 +8,10 @@
       </p>
       <contact-list :contacts='contacts' @open:chat="openChat"
                     @add:contact="addContact" :chats="chats"></contact-list>
+      <div @click="openChat(chat)" class="chat-item"
+           v-for="chat in Object.keys(chats)" :key="chat">
+        {{chats[chat].users.filter(user=>user!==currentUser).join(',')}}
+      </div>
     </div>
     <chat-view @reset:new="chats[currentChat].newMessages = false"
                class="chat-view"
@@ -34,7 +38,7 @@ export default {
       messages: [],
       msgs: {},
       contacts: [],
-      chats: {'': {messages: [], newMessages: ''}},
+      chats: {'': {messages: [], newMessages: '', users: []}},
       currentChat: '',
       socket: io('localhost:3000'),
       newMessages: {}
@@ -45,13 +49,13 @@ export default {
       console.log('ADDED aNEW USER')
       this.socket.emit('new:user', user)
     },
-    openChat (id) {
-      console.log('OPENING CHAT WITH USER: ', id)
-      this.currentChat = id
+    openChat (chat) {
+      console.log('OPENING CHAT: ', chat)
+      this.currentChat = chat
 
       // this.chats[id] = {messages: [], newMessages: false}
       // this.currentUserChat = id
-      this.socket.emit('get:chat', id)
+      this.socket.emit('get:chat', chat)
     },
     addContact (id) {
       // this.contacts.push(id)
@@ -68,7 +72,8 @@ export default {
       this.socket.emit('send:message', {
         sqn: sqn,
         payload: {
-          contact: this.currentChat,
+          chatId: this.currentChat,
+          // contact: this.currentChat,
           message: m
         }
       })
@@ -83,7 +88,8 @@ export default {
   mounted () {
     this.socket.on('login:ok', () => {
       console.log('LOGGED IN OK')
-      this.socket.emit('get:contacts')
+      // this.socket.emit('get:contacts')
+      this.socket.emit('get:all:chats')
     })
     this.socket.on('login:error', () => {
       console.log('THERE WAS AN ERROR LOGGING IN')
@@ -92,30 +98,36 @@ export default {
       this.contacts = m.contacts
       for (let id of m.contacts) {
         let chatObj = {}
-        chatObj[id] = {messages: [], newMessages: false}
+        chatObj[id] = {chatId: '', messages: [], newMessages: false}
         this.chats = Object.assign({}, this.chats, chatObj)
         console.log('ADDED CONTACT: ', this.chats)
       }
       console.log('RECEIVED CONTACTS:', m)
     })
+    this.socket.on('all:chats', (m) => {
+      // console.log('RECEIVED CHATSaaa: ', m)
+      this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(m.chats)))
+      console.log('CHATS::: ', m.chats)
+    })
     this.socket.on('chat', (m) => {
       // this.chats[m.user] = m
-      console.log('RECEIVED CHAT: ', m)
-
-      this.chats[m.contact].messages = m.messages
-      this.chats[m.contact].newMessages = true
-      let c = this.chats[this.currentChat].messages
-      console.log('current chat messages', c)
+      console.log('on chat', m)
+      console.log('ALL CHATS ARE: ', this.chats)
+      this.chats[m.chatId].messages = m.messages
+      this.chats[m.chatId].newMessages = true
+      console.log('ALL CHATS ARE: ', this.chats)
+      // let c = this.chats[this.currentChat].messages
+      // console.log('current chat messages', m)
     })
     this.socket.on('new:message', (m) => {
-      console.log('RECEIVED NEW MESSAGE: ', m)
+      console.log('on new:message', m)
       this.chats[m.contact].messages.push(m.message)
       this.chats[m.contact].newMessages = true
       // this.currentChat.push(m.message)
       // this.newMessages = true
     })
     this.socket.on('ack:message', (m) => {
-
+      console.log('on ack:message')
       let contact = this.msgs[m].contact
       let msg = this.msgs[m].message
       console.log('MESSAGE SENT OK: ', msg)
@@ -148,6 +160,11 @@ export default {
   }
 
   button:hover {
+    background-color: lightgreen;
+  }
+
+  .chat-item {
+    border-radius: 1em;
     background-color: lightgreen;
   }
 

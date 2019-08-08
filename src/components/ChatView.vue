@@ -1,7 +1,12 @@
 <template>
   <div id="chat-view">
     <div ref="msglist" class="messages">
-      <p class="msg" :key="msg.id" v-for="msg in messages">{{msg}}</p>
+      <div class="msg" :key="msg.id" v-for="msg in messages">
+        {{msg.user}}:
+        <p>
+          {{msg.content}}
+        </p>
+      </div>
     </div>
     <form @submit.prevent="handleSubmit">
       <label>Message:<input type="text" v-model="message"></label>

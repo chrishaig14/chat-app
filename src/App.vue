@@ -24,6 +24,7 @@ import Login from '@/components/Login'
 import ChatView from '@/components/ChatView'
 import io from 'socket.io-client'
 
+let sqn = 0
 export default {
   name: 'App',
   components: {ChatView, Login, Signup, ContactList},
@@ -31,6 +32,7 @@ export default {
     return {
       currentUser: '',
       messages: [],
+      msgs: {},
       contacts: [],
       chats: {'': {messages: [], newMessages: ''}},
       currentChat: '',
@@ -64,9 +66,18 @@ export default {
     },
     sendMessage (m) {
       this.socket.emit('send:message', {
+        sqn: sqn,
+        payload: {
+          contact: this.currentChat,
+          message: m
+        }
+      })
+      this.msgs[sqn] = {
         contact: this.currentChat,
         message: m
-      })
+      }
+      console.log('EMIT EVENT: send:message ', this.msgs[sqn])
+      sqn++
     }
   },
   mounted () {
@@ -102,6 +113,13 @@ export default {
       this.chats[m.contact].newMessages = true
       // this.currentChat.push(m.message)
       // this.newMessages = true
+    })
+    this.socket.on('ack:message', (m) => {
+
+      let contact = this.msgs[m].contact
+      let msg = this.msgs[m].message
+      console.log('MESSAGE SENT OK: ', msg)
+      this.chats[contact].messages.push(msg)
     })
   },
   updated () {

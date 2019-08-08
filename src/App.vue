@@ -74,12 +74,13 @@ export default {
         payload: {
           chatId: this.currentChat,
           // contact: this.currentChat,
-          message: m
+          content: m
         }
       })
       this.msgs[sqn] = {
-        contact: this.currentChat,
-        message: m
+        user: this.currentUser,
+        chatId: this.currentChat,
+        content: m
       }
       console.log('EMIT EVENT: send:message ', this.msgs[sqn])
       sqn++
@@ -121,17 +122,17 @@ export default {
     })
     this.socket.on('new:message', (m) => {
       console.log('on new:message', m)
-      this.chats[m.contact].messages.push(m.message)
-      this.chats[m.contact].newMessages = true
+      this.chats[m.chatId].messages.push(m.message)
+      this.chats[m.chatId].newMessages = true
       // this.currentChat.push(m.message)
       // this.newMessages = true
     })
     this.socket.on('ack:message', (m) => {
       console.log('on ack:message')
-      let contact = this.msgs[m].contact
-      let msg = this.msgs[m].message
+      // let contact = this.msgs[m].contact
+      let msg = this.msgs[m]
       console.log('MESSAGE SENT OK: ', msg)
-      this.chats[contact].messages.push(msg)
+      this.chats[msg.chatId].messages.push(msg)
     })
   },
   updated () {

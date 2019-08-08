@@ -1,8 +1,10 @@
 <template>
   <div id="chat-view">
     <div ref="msglist" class="messages">
-      <div class="msg" :key="msg.id" v-for="msg in messages">
-        {{msg.user}}:
+      <div class="msg"
+           :class="msg.user===currentUser?'myMessage':'otherMessage'"
+           :key="msg.id" v-for="msg in messages">
+        <span style="color:#777; font-style: italic">{{msg.user}}</span>
         <p>
           {{msg.content}}
         </p>
@@ -25,6 +27,7 @@ export default {
     }
   },
   props: {
+    currentUser: String,
     messages: Array,
     new: Boolean
   },
@@ -73,11 +76,27 @@ export default {
   }
 
   .msg {
-    border-radius: 1.5rem;
-    background-color: lightgreen;
-    padding: 0.5rem;
+    border-radius: 1.2rem;
+    /*background-color: lightgreen;*/
+    padding: 0.7rem;
     border: solid 1px green;
-    text-align: center;
+    /*text-align: center;*/
+    font-size: 0.7em;
+    margin-bottom: 1em;
+    max-width: 60%;
+    word-break: break-all;
+  }
+
+  .myMessage {
+    margin-right: 1em;
+    background-color: white;
+    align-self: flex-end;
+  }
+
+  .otherMessage {
+    margin-left: 1em;
+    background-color: lightgreen;
+    align-self: flex-start;
   }
 
   form {

@@ -13,7 +13,8 @@
         {{chats[chat].users.filter(user=>user!==currentUser).join(',')}}
       </div>
     </div>
-    <chat-view @reset:new="chats[currentChat].newMessages = false"
+    <chat-view :currentUser="currentUser"
+               @reset:new="chats[currentChat].newMessages = false"
                class="chat-view"
                @send:message="sendMessage"
                :messages='chats[currentChat].messages'

@@ -1,7 +1,8 @@
 <template>
   <div id="login">
     <form @submit.prevent="handleSubmit">
-      <label>Username<input type="text" v-model="user"></label>
+      <label for="username">Username</label>
+      <input id="username" type="text" v-model="user">
 
       <button>Login</button>
     </form>
@@ -25,5 +26,7 @@ export default {
 </script>
 
 <style scoped>
-
+  label {
+    padding-right: 1em;
+  }
 </style>

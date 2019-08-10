@@ -52,8 +52,8 @@ export default {
   .contact {
     margin-top: 0.5rem;
     /*background-color: whitesmoke;*/
-    border-radius: 1.5rem;
-    border: solid 1px gray;
+    /*border-radius: 1.5rem;*/
+    /*border: solid 1px gray;*/
     padding: 0.5rem;
   }
 

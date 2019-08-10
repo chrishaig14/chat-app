@@ -1,19 +1,22 @@
 <template>
   <div id="app">
-    <div>
+    <div class="side">
       <signup @new:user="newUser"></signup>
       <!--      <p v-for="user in users" :key="user.user">{{user.user}}</p>-->
       <login @login="login"/>
       <p>Current user: <span style="font-weight: bold">{{currentUser}}</span>
       </p>
-      <contact-list :contacts='contacts' @open:chat="openChat"
-                    @add:contact="addContact" :chats="chats"></contact-list>
-      <div @click="openChat(chat)" class="chat-item"
-           v-for="chat in Object.keys(chats)" :key="chat">
-        {{chats[chat].users.filter(user=>user!==currentUser).join(',')}}
+      <!--      <contact-list :contacts='contacts' @open:chat="openChat"-->
+      <!--                    @add:contact="addContact" :chats="chats"></contact-list>-->
+      <div>
+        <h2>Chats</h2>
+        <div @click="openChat(chat)" class="chat-item"
+             v-for="chat in Object.keys(chats)" :key="chat">
+          {{chats[chat].users.filter(user=>user!==currentUser).join(',')}}
+        </div>
       </div>
     </div>
-    <chat-view :currentUser="currentUser"
+    <chat-view v-if="currentChat!==''" :currentUser="currentUser"
                @reset:new="chats[currentChat].newMessages = false"
                class="chat-view"
                @send:message="sendMessage"
@@ -39,7 +42,7 @@ export default {
       messages: [],
       msgs: {},
       contacts: [],
-      chats: {'': {messages: [], newMessages: '', users: []}},
+      chats: {},
       currentChat: '',
       socket: io('localhost:3000'),
       newMessages: {}
@@ -148,6 +151,7 @@ export default {
     display: flex;
     flex-direction: row;
     height: 100%;
+    color: white;
   }
 
   button, input {
@@ -155,12 +159,21 @@ export default {
   }
 
   button {
-    border-radius: 1.5rem;
+    /*border-radius: 1.5rem;*/
     /*border: solid 1px gray;*/
     border: none;
-    box-shadow: gray 0 2px 3px 0;
+    /*box-shadow: gray 0 2px 3px 0;*/
     padding: 0.5rem;
-    background-color: greenyellow;
+    background-color: #e7ffa3;
+  }
+
+  .side {
+    background-color: #333333;
+    padding: 1em;
+  }
+
+  .chat-view {
+    flex-grow: 1
   }
 
   button:hover {
@@ -173,13 +186,16 @@ export default {
   }
 
   .chat-item {
-    border-radius: 1em;
-    background-color: lightgreen;
+    /*border-radius: 1em;*/
+    background-color: #e7ffa3;
+    padding: 0.5em;
+    color: black;
   }
 
   input[type="text"] {
-    border-radius: 1.5rem;
+    /*border-radius: 1.5rem;*/
     padding: 0.5rem;
-    border: solid 1px gray;
+    /*font-size: 14pt;*/
+    /*border: solid 1px gray;*/
   }
 </style>

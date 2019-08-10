@@ -4,14 +4,18 @@
       <div class="msg"
            :class="msg.user===currentUser?'myMessage':'otherMessage'"
            :key="msg.id" v-for="msg in messages">
-        <span style="color:#777; font-style: italic">{{msg.user}}</span>
-        <p>
+        <div class="msg-user" style="color:#777; font-style: italic">
+          {{msg.user}}
+        </div>
+        <!--        <p>-->
+        <div>
           {{msg.content}}
-        </p>
+        </div>
+        <!--        </p>-->
       </div>
     </div>
     <form @submit.prevent="handleSubmit">
-      <label>Message:<input type="text" v-model="message"></label>
+      <input type="text" v-model="message">
       <button>Send!</button>
     </form>
   </div>
@@ -56,15 +60,19 @@ export default {
 
 <style scoped>
   #chat-view {
-    background-color: lightgray;
+
     display: flex;
     flex-direction: column;
     justify-content: stretch;
+    /*align-items: center;*/
+    padding: 1em;
+    background-color: #c4c4c4;
+
   }
 
-  input {
-    background-color: white
-  }
+  /*form {*/
+  /*  margin-top: 1em;*/
+  /*}*/
 
   .messages {
     display: flex;
@@ -73,34 +81,47 @@ export default {
     align-items: center;
     overflow-y: auto;
     flex-grow: 1;
+    margin-bottom: 1em;
+    background-color: #a9a9a9;
+    padding: 1em;
   }
 
   .msg {
-    border-radius: 1.2rem;
+    /*border-radius: 1.2rem;*/
     /*background-color: lightgreen;*/
     padding: 0.7rem;
-    border: solid 1px green;
+    /*border: solid 1px green;*/
     /*text-align: center;*/
     font-size: 0.7em;
     margin-bottom: 1em;
     max-width: 60%;
+    color: black;
     word-break: break-all;
   }
 
+  .msg-user {
+    margin-bottom: 1em;
+  }
+
   .myMessage {
-    margin-right: 1em;
+    /*margin-right: 1em;*/
     background-color: white;
     align-self: flex-end;
   }
 
   .otherMessage {
-    margin-left: 1em;
-    background-color: lightgreen;
+    /*margin-left: 1em;*/
+    background-color: #e7ffa3;
     align-self: flex-start;
   }
 
   form {
     display: flex;
     flex-direction: row;
+    /*flex-grow:1;*/
+  }
+
+  form input {
+    flex-grow: 1;
   }
 </style>

@@ -2,7 +2,7 @@
   <div id="chat-view">
     <div ref="msglist" class="messages">
       <div class="msg"
-           :class="msg.user===currentUser?'myMessage':'otherMessage'"
+           :class="[msg.user===currentUser?'myMessage':'otherMessage',msg.user===currentUser? (msg.ack?'msg-sent':'msg-pending'):'']"
            :key="msg.id" v-for="msg in messages">
         <div class="msg-user" style="color:#777; font-style: italic">
           {{msg.user}}
@@ -46,6 +46,8 @@ export default {
   methods: {
     handleSubmit () {
       this.$emit('send:message', this.message)
+      // this.messages.push({content: this.message, user: this.currentUser})
+      this.message = ''
     }
   },
   mounted () {
@@ -113,6 +115,14 @@ export default {
     /*margin-left: 1em;*/
     background-color: #e7ffa3;
     align-self: flex-start;
+  }
+
+  .msg-sent {
+    background-color: green;
+  }
+
+  .msg-pending {
+    background-color: yellow;
   }
 
   form {

@@ -86,6 +86,12 @@ export default {
         chatId: this.currentChat,
         content: m
       }
+      this.chats[this.currentChat].messages.push({
+        user: this.currentUser,
+        content: m,
+        ack: false,
+        sqn: sqn
+      })
       console.log('EMIT EVENT: send:message ', this.msgs[sqn])
       sqn++
     }
@@ -118,6 +124,9 @@ export default {
       // this.chats[m.user] = m
       console.log('on chat', m)
       console.log('ALL CHATS ARE: ', this.chats)
+      m.messages = m.messages.map(msg => ({
+        ...msg, ack: true
+      }))
       this.chats[m.chatId].messages = m.messages
       this.chats[m.chatId].newMessages = true
       console.log('ALL CHATS ARE: ', this.chats)
@@ -135,8 +144,14 @@ export default {
       console.log('on ack:message')
       // let contact = this.msgs[m].contact
       let msg = this.msgs[m]
-      console.log('MESSAGE SENT OK: ', msg)
-      this.chats[msg.chatId].messages.push(msg)
+      console.log('RECEIVED ACK FOR MESSAGE: ', m)
+      this.chats[msg.chatId].messages.map(message => {
+        if (message.sqn === m) {
+          message.ack = true
+          return message
+        }
+        return message
+      })
     })
   },
   updated () {

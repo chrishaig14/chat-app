@@ -178,7 +178,7 @@ export default {
     /*border: solid 1px gray;*/
     border: none;
     /*box-shadow: gray 0 2px 3px 0;*/
-    padding: 0.5rem;
+    padding: 0.5em;
     background-color: #e7ffa3;
   }
 
@@ -192,8 +192,8 @@ export default {
   }
 
   button:hover {
-    background-color: lightgreen;
-    box-shadow: gray 0 2px 3px 0;
+    background-color: #95a66a;
+    /*box-shadow: gray 0 2px 3px 0;*/
   }
 
   button:active {
@@ -209,7 +209,8 @@ export default {
 
   input[type="text"] {
     /*border-radius: 1.5rem;*/
-    padding: 0.5rem;
+    border: none;
+    padding: 0.5em;
     /*font-size: 14pt;*/
     /*border: solid 1px gray;*/
   }

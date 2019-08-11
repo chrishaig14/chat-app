@@ -118,11 +118,11 @@ export default {
   }
 
   .msg-sent {
-    background-color: green;
+    background-color: white;
   }
 
   .msg-pending {
-    background-color: yellow;
+    background-color: #ffff80;
   }
 
   form {

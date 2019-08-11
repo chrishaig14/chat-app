@@ -8,8 +8,17 @@
       </p>
       <!--      <contact-list :contacts='contacts' @open:chat="openChat"-->
       <!--                    @add:contact="addContact" :chats="chats"></contact-list>-->
+      <!--      <div>-->
+      <!--        <h2>Chats</h2>-->
+      <!--        <div @click="openChat(chat)" class="chat-item"-->
+      <!--             v-for="chat in Object.keys(chats)" :key="chat">-->
+      <!--          {{chats[chat].users.filter(user=>user!==currentUser).join(',')}}-->
+      <!--        </div>-->
+      <!--      </div>-->
       <div>
         <h2>Chats</h2>
+        <h3>New chat</h3>
+        <new-chat></new-chat>
         <div @click="openChat(chat)" class="chat-item"
              v-for="chat in Object.keys(chats)" :key="chat">
           {{chats[chat].users.filter(user=>user!==currentUser).join(',')}}
@@ -26,22 +35,23 @@
 </template>
 
 <script>
-import ContactList from '@/components/ContactList'
+// import ContactList from '@/components/ContactList'
 import Signup from '@/components/Signup'
 import Login from '@/components/Login'
 import ChatView from '@/components/ChatView'
 import io from 'socket.io-client'
+import NewChat from './components/NewChat'
 
 let sqn = 0
 export default {
   name: 'App',
-  components: {ChatView, Login, Signup, ContactList},
+  components: {NewChat, ChatView, Login, Signup},
   data () {
     return {
       currentUser: '',
       messages: [],
       msgs: {},
-      contacts: [],
+      // contacts: [],
       chats: {},
       currentChat: '',
       socket: io('localhost:3000'),
@@ -61,17 +71,17 @@ export default {
       // this.currentUserChat = id
       this.socket.emit('get:chat', chat)
     },
-    addContact (id) {
-      // this.contacts.push(id)
-      this.socket.emit('add:contact', id)
-    },
+    // addContact (id) {
+    //   // this.contacts.push(id)
+    //   this.socket.emit('add:contact', id)
+    // },
     login (id) {
       this.socket.emit('login', id)
       this.currentUser = id
     },
-    getContacts () {
-      this.socket.emit('get:contacts')
-    },
+    // getContacts () {
+    //   this.socket.emit('get:contacts')
+    // },
     sendMessage (m) {
       this.socket.emit('send:message', {
         sqn: sqn,
@@ -99,22 +109,23 @@ export default {
   mounted () {
     this.socket.on('login:ok', () => {
       console.log('LOGGED IN OK')
-      // this.socket.emit('get:contacts')
+      this.socket.emit('get:contacts')
       this.socket.emit('get:all:chats')
     })
     this.socket.on('login:error', () => {
       console.log('THERE WAS AN ERROR LOGGING IN')
     })
-    this.socket.on('contacts', (m) => {
-      this.contacts = m.contacts
-      for (let id of m.contacts) {
-        let chatObj = {}
-        chatObj[id] = {chatId: '', messages: [], newMessages: false}
-        this.chats = Object.assign({}, this.chats, chatObj)
-        console.log('ADDED CONTACT: ', this.chats)
-      }
-      console.log('RECEIVED CONTACTS:', m)
-    })
+    // this.socket.on('contacts', (m) => {
+    //   console.log('RECEIVED CONTACTS:', m)
+    //   this.contacts = m.contacts
+    //   // for (let id of m.contacts) {
+    //   //   let chatObj = {}
+    //   //   chatObj[id] = {chatId: '', messages: [], newMessages: false}
+    //   //   this.chats = Object.assign({}, this.chats, chatObj)
+    //   //   console.log('ADDED CONTACT: ', this.chats)
+    //   // }
+    //
+    // })
     this.socket.on('all:chats', (m) => {
       // console.log('RECEIVED CHATSaaa: ', m)
       this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(m.chats)))

@@ -2,26 +2,17 @@
   <div id="app">
     <div class="side">
       <signup @new:user="newUser"></signup>
-      <!--      <p v-for="user in users" :key="user.user">{{user.user}}</p>-->
       <login @login="login"/>
       <p>Current user: <span style="font-weight: bold">{{currentUser}}</span>
       </p>
-      <!--      <contact-list :contacts='contacts' @open:chat="openChat"-->
-      <!--                    @add:contact="addContact" :chats="chats"></contact-list>-->
-      <!--      <div>-->
-      <!--        <h2>Chats</h2>-->
-      <!--        <div @click="openChat(chat)" class="chat-item"-->
-      <!--             v-for="chat in Object.keys(chats)" :key="chat">-->
-      <!--          {{chats[chat].users.filter(user=>user!==currentUser).join(',')}}-->
-      <!--        </div>-->
-      <!--      </div>-->
       <div>
         <h2>Chats</h2>
         <h3>New chat</h3>
-        <new-chat></new-chat>
+        <new-chat class="new-chat" @new:chat="newChat"></new-chat>
         <div @click="openChat(chat)" class="chat-item"
+             :class="[chats[chat].newMessages?'chat-item-new':'',chat===currentChat?'current-chat':'']"
              v-for="chat in Object.keys(chats)" :key="chat">
-          {{chats[chat].users.filter(user=>user!==currentUser).join(',')}}
+          {{chats[chat].type==='simple'?chats[chat].users.filter(user=>user!==currentUser).join(','):chats[chat].name}}
         </div>
       </div>
     </div>
@@ -35,7 +26,6 @@
 </template>
 
 <script>
-// import ContactList from '@/components/ContactList'
 import Signup from '@/components/Signup'
 import Login from '@/components/Login'
 import ChatView from '@/components/ChatView'
@@ -51,7 +41,6 @@ export default {
       currentUser: '',
       messages: [],
       msgs: {},
-      // contacts: [],
       chats: {},
       currentChat: '',
       socket: io('localhost:3000'),
@@ -59,6 +48,10 @@ export default {
     }
   },
   methods: {
+    newChat (chat) {
+      console.log('NEW CHAT: ', chat)
+      this.socket.emit('new:chat', chat)
+    },
     newUser (user) {
       console.log('ADDED aNEW USER')
       this.socket.emit('new:user', user)
@@ -66,28 +59,17 @@ export default {
     openChat (chat) {
       console.log('OPENING CHAT: ', chat)
       this.currentChat = chat
-
-      // this.chats[id] = {messages: [], newMessages: false}
-      // this.currentUserChat = id
       this.socket.emit('get:chat', chat)
     },
-    // addContact (id) {
-    //   // this.contacts.push(id)
-    //   this.socket.emit('add:contact', id)
-    // },
     login (id) {
       this.socket.emit('login', id)
       this.currentUser = id
     },
-    // getContacts () {
-    //   this.socket.emit('get:contacts')
-    // },
     sendMessage (m) {
       this.socket.emit('send:message', {
         sqn: sqn,
         payload: {
           chatId: this.currentChat,
-          // contact: this.currentChat,
           content: m
         }
       })
@@ -127,7 +109,7 @@ export default {
     //
     // })
     this.socket.on('all:chats', (m) => {
-      // console.log('RECEIVED CHATSaaa: ', m)
+      console.log('RECEIVED CHATSaaa: ', m)
       this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(m.chats)))
       console.log('CHATS::: ', m.chats)
     })
@@ -202,6 +184,10 @@ export default {
     flex-grow: 1
   }
 
+  .current-chat {
+    background-color: red;
+  }
+
   button:hover {
     background-color: #95a66a;
     /*box-shadow: gray 0 2px 3px 0;*/
@@ -214,8 +200,17 @@ export default {
   .chat-item {
     /*border-radius: 1em;*/
     background-color: #e7ffa3;
+    margin-bottom: 1em;
     padding: 0.5em;
     color: black;
+  }
+
+  .chat-item-new {
+    background-color: green;
+  }
+
+  .new-chat {
+    margin-bottom: 1em;
   }
 
   input[type="text"] {

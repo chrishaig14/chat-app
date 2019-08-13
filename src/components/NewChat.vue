@@ -3,7 +3,16 @@
     <button @click="()=>{chat.type='simple'; resetChat();}">Simple</button>
     <button @click="()=>{chat.type='group'; resetChat();}">Group</button>
     <div v-if="chat.type==='simple'" class="simple-chat-form">
-      <label>User: <input type="text" v-model="newUser"></label>
+      <label>User:</label>
+      <div class="input-div" onblur="clicked" contenteditable="true">
+        <input type="text" v-model="newUser"
+               @focus="suggesting=true">
+        <div v-if="suggesting" class="suggest-box">
+          <div :key="sug" v-for="sug in suggestions" class="suggest-item"
+               @click="selectSuggestion(sug)">{{sug}}
+          </div>
+        </div>
+      </div>
     </div>
     <div v-if="chat.type==='group'" class="group-chat-form">
       <div class="chat-user" v-for="user in chat.users" :key="user">
@@ -35,10 +44,36 @@ export default {
       chat: {type: 'simple', name: '', users: []},
       newUser: '',
       msg: '',
-      ok: false
+      ok: false,
+      suggesting: true,
+      pepe: ''
+    }
+  },
+  props: {
+    suggestions: Array
+  },
+  watch: {
+    newUser: function (val) {
+      if (val !== '') {
+        this.$emit('suggest:users', val)
+      }
+    },
+    suggestions: (val) => {
+      console.log('SUGGESTIONS ARE: ', val)
     }
   },
   methods: {
+    logsug () {
+      console.log('SUGGESTING: ', this.suggesting)
+    },
+    clicked () {
+      console.log('CLICKED!')
+    },
+    selectSuggestion (sug) {
+      this.newUser = sug
+      this.suggesting = false
+      console.log('SELECTING SUGGESTION:', sug)
+    },
     resetChat () {
       // this.chat.type = ''
       this.chat.name = ''
@@ -135,6 +170,41 @@ export default {
   .simple-chat-form {
     margin-bottom: 1em;
     padding: 1em;
+    display: flex;
+    flex-direction: row;
+  }
+
+  /*.simple-chat-form input {*/
+  /*  flex-grow: 1;*/
+  /*}*/
+
+  .input-div {
+    position: relative;
+    /*width: 100%;*/
+    flex-grow: 1;
+  }
+
+  .input-div input {
+    width: 100%;
+  }
+
+  .suggest-box {
+    position: absolute;
+    /*top: 3em;*/
+    background-color: white;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .suggest-item {
+    color: black;
+    /*width: 100%;*/
+    padding: 1em;
+  }
+
+  .suggest-item:hover {
+    background-color: lightgreen;
   }
 
   .chat-name {

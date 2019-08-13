@@ -8,7 +8,9 @@
       <div>
         <h2>Chats</h2>
         <h3>New chat</h3>
-        <new-chat class="new-chat" @new:chat="newChat"></new-chat>
+        <new-chat :suggestions="suggestions" @suggest:users='suggestUsers'
+                  class="new-chat"
+                  @new:chat="newChat"></new-chat>
         <div @click="openChat(chat)" class="chat-item"
              :class="chat===currentChat?'current-chat':'other-chat'"
              v-for="chat in Object.keys(chats)" :key="chat">
@@ -46,13 +48,21 @@ export default {
       currentUser: '',
       messages: [],
       msgs: {},
-      chats: {'': {messages: [], newMessages: false}},
+      chats: {},
       currentChat: '',
       socket: io('localhost:3000'),
-      newMessages: {}
+      newMessages: {},
+      suggestions: []
     }
   },
   methods: {
+    suggestUsers (str) {
+      this.socket.emit('suggest:users', str, (result) => {
+        console.log('SUGGESTIONS: ', result)
+        this.suggestions = result
+
+      })
+    },
     markRead (data) {
       this.socket.emit('mark:read', data)
     },
@@ -229,10 +239,12 @@ export default {
   .side {
     background-color: #333333;
     padding: 1em;
+    width: 30%;
   }
 
   .chat-view {
-    flex-grow: 1
+    /*flex-grow: 1*/
+    width: 70%;
   }
 
   .current-chat {

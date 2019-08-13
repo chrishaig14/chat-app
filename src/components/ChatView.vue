@@ -11,6 +11,7 @@
         <div>
           {{msg.content}}
         </div>
+        Read by {{msg.read}}
         <!--        </p>-->
       </div>
     </div>
@@ -33,29 +34,40 @@ export default {
   props: {
     currentUser: String,
     messages: Array,
-    new: Boolean
-  },
-  watch: {
-    new: function (val) {
-      if (val) {
-        console.log('NEW MESSAGES!')
-        this.$emit('reset:new')
-      }
-    }
+    new: Boolean,
+    chatId: String
   },
   methods: {
     handleSubmit () {
       this.$emit('send:message', this.message)
       // this.messages.push({content: this.message, user: this.currentUser})
       this.message = ''
+    },
+    markAllAsRead () {
+      console.log('######### CHAT UPDATED ########', this.messages)
+      // console.log('MY PROPS ARE:', this.new, this.messages)
+      this.$refs.msglist.scrollTop = this.$refs.msglist.scrollHeight
+      let readMsgs = []
+
+      for (let msg of this.messages) {
+        if (!msg.read.includes(this.currentUser)) {
+          readMsgs.push(msg.messageId)
+        }
+      }
+      if (readMsgs.length !== 0) {
+        // console.log('READMSGS: ', readMsgs)
+        this.$emit('mark:read', {chatId: this.chatId, messageIds: readMsgs})
+      }
     }
   },
+
   mounted () {
-    console.log('this.messages:', this.messages)
+    console.log('MOUNTED CHAT VIEW: ', this.messages)
+    this.markAllAsRead()
   },
+
   updated () {
-    console.log('MY PROPS ARE:', this.new, this.messages)
-    this.$refs.msglist.scrollTop = this.$refs.msglist.scrollHeight
+    this.markAllAsRead()
   }
 }
 </script>

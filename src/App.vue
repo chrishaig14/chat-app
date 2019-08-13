@@ -10,13 +10,18 @@
         <h3>New chat</h3>
         <new-chat class="new-chat" @new:chat="newChat"></new-chat>
         <div @click="openChat(chat)" class="chat-item"
-             :class="[chats[chat].newMessages?'chat-item-new':'',chat===currentChat?'current-chat':'']"
+             :class="chat===currentChat?'current-chat':'other-chat'"
              v-for="chat in Object.keys(chats)" :key="chat">
           {{chats[chat].type==='simple'?chats[chat].users.filter(user=>user!==currentUser).join(','):chats[chat].name}}
+          <div
+            style="display:inline-block;border-radius: 50%;width:10px;background-color: green;height:10px;"
+            v-if="chats[chat].newMessages"></div>
         </div>
       </div>
     </div>
-    <chat-view v-if="currentChat!==''" :currentUser="currentUser"
+    <chat-view :chatId="currentChat" @mark:read="markRead"
+               v-if="currentChat!==''"
+               :currentUser="currentUser"
                @reset:new="chats[currentChat].newMessages = false"
                class="chat-view"
                @send:message="sendMessage"
@@ -41,13 +46,16 @@ export default {
       currentUser: '',
       messages: [],
       msgs: {},
-      chats: {},
+      chats: {'': {messages: [], newMessages: false}},
       currentChat: '',
       socket: io('localhost:3000'),
       newMessages: {}
     }
   },
   methods: {
+    markRead (data) {
+      this.socket.emit('mark:read', data)
+    },
     newChat (chat) {
       console.log('NEW CHAT: ', chat)
       this.socket.emit('new:chat', chat)
@@ -56,13 +64,14 @@ export default {
       console.log('ADDED aNEW USER')
       this.socket.emit('new:user', user)
     },
-    openChat (chat) {
-      console.log('OPENING CHAT: ', chat)
-      this.currentChat = chat
-      this.socket.emit('get:chat', chat)
+    openChat (chatId) {
+      console.log('OPENING CHAT: ', chatId)
+      this.currentChat = chatId
+      // this.socket.emit('get:chat', chatId)
+      // this.chats[chatId].newMessages = false
     },
     login (id) {
-      this.socket.emit('login', id)
+      this.socket.emit('login', id, this.callAfterLogin)
       this.currentUser = id
     },
     sendMessage (m) {
@@ -86,35 +95,45 @@ export default {
       })
       console.log('EMIT EVENT: send:message ', this.msgs[sqn])
       sqn++
+    },
+    callAfterLogin () {
+      console.log('THIS WAS CALLED!')
     }
   },
   mounted () {
     this.socket.on('login:ok', () => {
       console.log('LOGGED IN OK')
-      this.socket.emit('get:contacts')
+      // this.socket.emit('get:contacts',)
       this.socket.emit('get:all:chats')
     })
     this.socket.on('login:error', () => {
       console.log('THERE WAS AN ERROR LOGGING IN')
     })
-    // this.socket.on('contacts', (m) => {
-    //   console.log('RECEIVED CONTACTS:', m)
-    //   this.contacts = m.contacts
-    //   // for (let id of m.contacts) {
-    //   //   let chatObj = {}
-    //   //   chatObj[id] = {chatId: '', messages: [], newMessages: false}
-    //   //   this.chats = Object.assign({}, this.chats, chatObj)
-    //   //   console.log('ADDED CONTACT: ', this.chats)
-    //   // }
-    //
-    // })
     this.socket.on('all:chats', (m) => {
-      console.log('RECEIVED CHATSaaa: ', m)
-      this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(m.chats)))
+      console.log('RECEIVED CHATSaaa: ', m.chats)
+      let chats = m.chats
+      for (let chatId in chats) {
+        console.log('processing chat #', chatId)
+        let hasNew = false
+        let chat = chats[chatId]
+        chat.newMessages = false
+        for (let msg of chat.messages) {
+          if (!msg.read.includes(this.currentUser)) {
+            chat.newMessages = true
+            hasNew = true
+            break
+          }
+        }
+        if (hasNew) {
+          console.log('new messages in chat')
+        } else {
+          console.log('no new messages in chat')
+        }
+      }
       console.log('CHATS::: ', m.chats)
+      this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(chats)))
     })
     this.socket.on('chat', (m) => {
-      // this.chats[m.user] = m
       console.log('on chat', m)
       console.log('ALL CHATS ARE: ', this.chats)
       m.messages = m.messages.map(msg => ({
@@ -123,32 +142,64 @@ export default {
       this.chats[m.chatId].messages = m.messages
       this.chats[m.chatId].newMessages = true
       console.log('ALL CHATS ARE: ', this.chats)
-      // let c = this.chats[this.currentChat].messages
-      // console.log('current chat messages', m)
     })
     this.socket.on('new:message', (m) => {
       console.log('on new:message', m)
       this.chats[m.chatId].messages.push(m.message)
       this.chats[m.chatId].newMessages = true
-      // this.currentChat.push(m.message)
-      // this.newMessages = true
     })
     this.socket.on('ack:message', (m) => {
       console.log('on ack:message')
-      // let contact = this.msgs[m].contact
-      let msg = this.msgs[m]
+      // let msg = this.msgs[m]
       console.log('RECEIVED ACK FOR MESSAGE: ', m)
-      this.chats[msg.chatId].messages.map(message => {
-        if (message.sqn === m) {
-          message.ack = true
-          return message
+
+      // this.chats[this.currentChat].messages.push({
+      //   user: this.currentUser,
+      //   content: m,
+      //   ack: false,
+      //   sqn: sqn
+      // })
+
+      // for (let i = 0; i < this.chats[m.chatId].messages.length; i++) {
+      //   let msg = this.chats[m.chatId].messages[i]
+      //   if (msg.sqn === m.sqn) {
+      //     this.chats[m.chatId].messages[i] = m.message
+      //   }
+      // }
+
+      // this.chats[m.chatId].messages.push(m.message)
+
+      let chats = JSON.parse(JSON.stringify(this.chats))
+      // for (let msgRead of m.messagesRead) {
+      for (let i = 0; i < chats[m.chatId].messages.length; i++) {
+        if (chats[m.chatId].messages[i].sqn === m.sqn) {
+          chats[m.chatId].messages[i] = m.message
         }
-        return message
-      })
+      }
+      // }
+
+      // this.chats = Object.assign({},this)
+      this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(chats)))
+
+    })
+    this.socket.on('ack:read', (m) => {
+      console.log('RECEIVED MESSAGE READ INFORMATION!', m)
+      let chats = JSON.parse(JSON.stringify(this.chats))
+      for (let msgRead of m.messagesRead) {
+        for (let i = 0; i < chats[m.chatId].messages.length; i++) {
+          if (chats[m.chatId].messages[i].messageId === msgRead.messageId) {
+            chats[m.chatId].messages[i].read = msgRead.read
+          }
+        }
+      }
+
+      // this.chats = Object.assign({},this)
+      this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(chats)))
     })
   },
   updated () {
     let c = this.chats[this.currentChat].messages
+
     console.log('current chat messages', c)
   }
 }
@@ -206,7 +257,15 @@ export default {
   }
 
   .chat-item-new {
-    background-color: green;
+    background-color: yellow;
+  }
+
+  .current-chat {
+    border: solid 2px green;
+  }
+
+  .other-chat {
+    border: none;
   }
 
   .new-chat {

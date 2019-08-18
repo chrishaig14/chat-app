@@ -1,17 +1,8 @@
 <template>
   <div id="chat-view">
     <div ref="msglist" class="messages">
-      <div class="msg"
-           :class="[msg.user===currentUser?'myMessage':'otherMessage',msg.user===currentUser? (msg.ack?'msg-sent':'msg-pending'):'']"
-           :key="msg.id" v-for="msg in messages">
-        <div class="msg-user" style="color:#777; font-style: italic">
-          {{msg.user}}
-        </div>
-        <div>
-          {{msg.content}}
-        </div>
-        Read by {{msg.read}}
-      </div>
+      <message v-for="msg in messages" :key="msg.id" :message="msg"
+               :current-user="currentUser"/>
     </div>
     <form @submit.prevent="handleSubmit">
       <input type="text" v-model="message">
@@ -22,8 +13,11 @@
 
 <script>
 
+import Message from './Message'
+
 export default {
   name: 'ChatView',
+  components: {Message},
   data () {
     return {
       message: ''

@@ -59,27 +59,22 @@ export default {
       }
     },
     suggestions: (val) => {
-      console.log('SUGGESTIONS ARE: ', val)
     }
   },
   methods: {
     logsug () {
-      console.log('SUGGESTING: ', this.suggesting)
     },
     clicked () {
-      console.log('CLICKED!')
     },
     selectSuggestion (sug) {
       this.newUser = sug
       this.suggesting = false
-      console.log('SELECTING SUGGESTION:', sug)
     },
     resetChat () {
       // this.chat.type = ''
       this.chat.name = ''
       this.chat.users = []
       this.newUser = ''
-      console.log('RESETTING CHAT')
     },
     resetName () {
       if (this.chat.name === '') {
@@ -88,7 +83,6 @@ export default {
     },
     deleteUser (user) {
       this.chat.users = this.chat.users.filter(u => u !== user)
-      console.log('DELETING USER:', this.chat.users)
     },
     handleAddUser () {
       if (this.newUser === '') {
@@ -98,9 +92,6 @@ export default {
       this.newUser = ''
     },
     createChat () {
-      console.log('CREATNIG CHAT: ', this.chat.users)
-      // console.log(this.$data.chat.users)
-      // console.log('this.msg:', this.msg)
       if (this.chat.type === 'simple') {
         if (this.newUser === '') {
           this.msg = 'You must add a user to the chat!'
@@ -124,7 +115,6 @@ export default {
         this.ok = true
       }
 
-      console.log('CREATING CHAT: ', this.chat)
       this.$emit('new:chat', this.chat)
       this.resetChat()
     }
@@ -174,13 +164,8 @@ export default {
     flex-direction: row;
   }
 
-  /*.simple-chat-form input {*/
-  /*  flex-grow: 1;*/
-  /*}*/
-
   .input-div {
     position: relative;
-    /*width: 100%;*/
     flex-grow: 1;
   }
 
@@ -190,7 +175,6 @@ export default {
 
   .suggest-box {
     position: absolute;
-    /*top: 3em;*/
     background-color: white;
     width: 100%;
     display: flex;
@@ -199,7 +183,6 @@ export default {
 
   .suggest-item {
     color: black;
-    /*width: 100%;*/
     padding: 1em;
   }
 

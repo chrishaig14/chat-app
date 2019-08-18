@@ -14,7 +14,6 @@
         {{contact}}
       </div>
     </div>
-    <!--    <p v-for="user in users" :key="user.user">{{user.user}}</p>-->
   </div>
 </template>
 
@@ -42,18 +41,13 @@ export default {
     border: solid 1px gray;
   }
 
-  /*h1 {}*/
   .list {
     display: flex;
     flex-direction: column;
-    /*align-items: center;*/
   }
 
   .contact {
     margin-top: 0.5rem;
-    /*background-color: whitesmoke;*/
-    /*border-radius: 1.5rem;*/
-    /*border: solid 1px gray;*/
     padding: 0.5rem;
   }
 

@@ -7,12 +7,10 @@
         <div class="msg-user" style="color:#777; font-style: italic">
           {{msg.user}}
         </div>
-        <!--        <p>-->
         <div>
           {{msg.content}}
         </div>
         Read by {{msg.read}}
-        <!--        </p>-->
       </div>
     </div>
     <form @submit.prevent="handleSubmit">
@@ -40,12 +38,9 @@ export default {
   methods: {
     handleSubmit () {
       this.$emit('send:message', this.message)
-      // this.messages.push({content: this.message, user: this.currentUser})
       this.message = ''
     },
     markAllAsRead () {
-      console.log('######### CHAT UPDATED ########', this.messages)
-      // console.log('MY PROPS ARE:', this.new, this.messages)
       this.$refs.msglist.scrollTop = this.$refs.msglist.scrollHeight
       let readMsgs = []
 
@@ -55,14 +50,12 @@ export default {
         }
       }
       if (readMsgs.length !== 0) {
-        // console.log('READMSGS: ', readMsgs)
         this.$emit('mark:read', {chatId: this.chatId, messageIds: readMsgs})
       }
     }
   },
 
   mounted () {
-    console.log('MOUNTED CHAT VIEW: ', this.messages)
     this.markAllAsRead()
   },
 
@@ -78,20 +71,14 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: stretch;
-    /*align-items: center;*/
     padding: 1em;
     background-color: #c4c4c4;
 
   }
 
-  /*form {*/
-  /*  margin-top: 1em;*/
-  /*}*/
-
   .messages {
     display: flex;
     flex-direction: column;
-    /*align-content: center;*/
     align-items: center;
     overflow-y: auto;
     flex-grow: 1;
@@ -101,11 +88,7 @@ export default {
   }
 
   .msg {
-    /*border-radius: 1.2rem;*/
-    /*background-color: lightgreen;*/
     padding: 0.7rem;
-    /*border: solid 1px green;*/
-    /*text-align: center;*/
     font-size: 0.7em;
     margin-bottom: 1em;
     max-width: 60%;
@@ -118,13 +101,11 @@ export default {
   }
 
   .myMessage {
-    /*margin-right: 1em;*/
     background-color: white;
     align-self: flex-end;
   }
 
   .otherMessage {
-    /*margin-left: 1em;*/
     background-color: #e7ffa3;
     align-self: flex-start;
   }
@@ -140,7 +121,6 @@ export default {
   form {
     display: flex;
     flex-direction: row;
-    /*flex-grow:1;*/
   }
 
   form input {

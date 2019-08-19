@@ -53,11 +53,9 @@ export default {
       show_new_chat: false,
       currentUser: '',
       messages: [],
-      msgs: {},
       chats: {},
       currentChat: '',
       socket: io('localhost:3000'),
-      newMessages: {},
       suggestions: []
     }
   },
@@ -92,11 +90,6 @@ export default {
           content: m
         }
       })
-      this.msgs[sqn] = {
-        user: this.currentUser,
-        chatId: this.currentChat,
-        content: m
-      }
       this.chats[this.currentChat].messages.push({
         user: this.currentUser,
         content: m,

@@ -8,7 +8,7 @@
     <div>
       {{message.content}}
     </div>
-    <!--    Read by {{message.read}}-->
+    {{(new Date(message.timestamp)).toLocaleString()}}
   </div>
 </template>
 

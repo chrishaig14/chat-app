@@ -78,9 +78,32 @@ export default {
     openChat (chatId) {
       this.currentChat = chatId
     },
+    getAllChats () {
+      this.socket.emit('get:all:chats', (m) => {
+        let chats = m.chats
+        for (let chatId in chats) {
+          let hasNew = false
+          let chat = chats[chatId]
+          chat.newMessages = false
+          for (let msg of chat.messages) {
+            if (!msg.read.includes(this.currentUser)) {
+              chat.newMessages = true
+              hasNew = true
+              break
+            }
+          }
+          if (hasNew) {
+          } else {
+          }
+        }
+        this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(chats)))
+      })
+    },
     login (id) {
-      this.socket.emit('login', id)
-      this.currentUser = id
+      this.socket.emit('login', id, () => {
+        this.currentUser = id
+        this.getAllChats()
+      })
     },
     sendMessage (m) {
       this.socket.emit('send:message', {
@@ -100,30 +123,6 @@ export default {
     }
   },
   mounted () {
-    this.socket.on('login:ok', () => {
-      this.socket.emit('get:all:chats')
-    })
-    this.socket.on('login:error', () => {
-    })
-    this.socket.on('all:chats', (m) => {
-      let chats = m.chats
-      for (let chatId in chats) {
-        let hasNew = false
-        let chat = chats[chatId]
-        chat.newMessages = false
-        for (let msg of chat.messages) {
-          if (!msg.read.includes(this.currentUser)) {
-            chat.newMessages = true
-            hasNew = true
-            break
-          }
-        }
-        if (hasNew) {
-        } else {
-        }
-      }
-      this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(chats)))
-    })
     this.socket.on('chat', (m) => {
       m.messages = m.messages.map(msg => ({
         ...msg, ack: true
@@ -144,7 +143,6 @@ export default {
         }
       }
       this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(chats)))
-
     })
     this.socket.on('ack:read', (m) => {
       let chats = JSON.parse(JSON.stringify(this.chats))

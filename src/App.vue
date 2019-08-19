@@ -155,6 +155,7 @@ export default {
           }
         }
       }
+      chats[m.chatId].newMessages = false
       this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(chats)))
     })
   },

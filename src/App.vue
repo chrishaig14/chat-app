@@ -15,8 +15,8 @@
         <new-chat v-if="show_new_chat" :suggestions="suggestions"
                   @suggest:users='suggestUsers'
                   class="new-chat"
-                  @new:chat="newChat"/>
-        <div @click="openChat(chat)" class="chat-item"
+                  @new:chat="newChat" @cancel="show_new_chat=false"/>
+        <div v-else @click="openChat(chat)" class="chat-item"
              :class="chat===currentChat?'current-chat':'other-chat'"
              v-for="chat in Object.keys(chats)" :key="chat">
           {{chats[chat].type==='simple'?chats[chat].users.filter(user=>user!==currentUser).join(','):chats[chat].name}}

@@ -32,6 +32,7 @@
       </div>
     </div>
     <button @click="createChat">Create chat</button>
+    <button @click="$emit('cancel')">Cancel</button>
     <div :class="ok?'msg-ok':'msg-not-ok'" v-if="msg!== ''">{{msg}}</div>
   </div>
 </template>

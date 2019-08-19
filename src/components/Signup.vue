@@ -2,7 +2,7 @@
   <div id="signup">
     <form @submit.prevent="handleSubmit">
       <label for="username">Username</label>
-      <input id="username" type="text" v-model="user">
+      <input autocomplete="off" id="username" type="text" v-model="user">
 
       <button>Signup</button>
     </form>

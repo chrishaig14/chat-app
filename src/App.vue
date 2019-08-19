@@ -7,10 +7,15 @@
       </p>
       <div>
         <h2>Chats</h2>
-        <h3>New chat</h3>
-        <new-chat :suggestions="suggestions" @suggest:users='suggestUsers'
+        <button @click="show_new_chat=true" style="margin-bottom: 1em;">Create
+          new chat
+        </button>
+        <!--        <h3>New chat</h3>-->
+
+        <new-chat v-if="show_new_chat" :suggestions="suggestions"
+                  @suggest:users='suggestUsers'
                   class="new-chat"
-                  @new:chat="newChat"></new-chat>
+                  @new:chat="newChat"/>
         <div @click="openChat(chat)" class="chat-item"
              :class="chat===currentChat?'current-chat':'other-chat'"
              v-for="chat in Object.keys(chats)" :key="chat">
@@ -45,6 +50,7 @@ export default {
   components: {NewChat, ChatView, Login, Signup},
   data () {
     return {
+      show_new_chat: false,
       currentUser: '',
       messages: [],
       msgs: {},
@@ -66,6 +72,7 @@ export default {
     },
     newChat (chat) {
       this.socket.emit('new:chat', chat)
+      this.show_new_chat = false
     },
     newUser (user) {
       this.socket.emit('new:user', user)

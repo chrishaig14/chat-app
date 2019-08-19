@@ -1,26 +1,35 @@
 <template>
   <div id="chat-view">
-    <div ref="msglist" class="messages">
-      <message v-for="msg in messages" :key="msg.id" :message="msg"
-               :current-user="currentUser"/>
+    <div class="main">
+      <div ref="msglist" class="messages">
+        <message v-for="msg in messages" :key="msg.id" :message="msg"
+                 :current-user="currentUser" @message:click="clickMessage"/>
+      </div>
+      <form @submit.prevent="handleSubmit">
+        <input type="text" v-model="message">
+        <button>Send!</button>
+      </form>
     </div>
-    <form @submit.prevent="handleSubmit">
-      <input type="text" v-model="message">
-      <button>Send!</button>
-    </form>
+    <!--    <div style="width: 100px;height:100px; background-color:blue;"></div>-->
+    <message-info @close='messageInfo=false' v-if="messageInfo"
+                  :message="messages.filter(msg => msg.messageId === messageInfoId)[0]"/>
+    <!--    <span v-if="messageInfo" style="color:blue">IS TRUE!</span>-->
   </div>
 </template>
 
 <script>
 
 import Message from './Message'
+import MessageInfo from './MessageInfo'
 
 export default {
   name: 'ChatView',
-  components: {Message},
+  components: {MessageInfo, Message},
   data () {
     return {
-      message: ''
+      message: '',
+      messageInfo: false,
+      messageInfoId: -1
     }
   },
   props: {
@@ -30,12 +39,17 @@ export default {
     chatId: String
   },
   methods: {
+    clickMessage (messageId) {
+      this.messageInfo = true
+      this.messageInfoId = messageId
+      console.log('clicked on message id: ', messageId)
+    },
     handleSubmit () {
       this.$emit('send:message', this.message)
       this.message = ''
     },
     markAllAsRead () {
-      this.$refs.msglist.scrollTop = this.$refs.msglist.scrollHeight
+      // this.$refs.msglist.scrollTop = this.$refs.msglist.scrollHeight
       let readMsgs = []
 
       for (let msg of this.messages) {
@@ -61,13 +75,22 @@ export default {
 
 <style scoped>
   #chat-view {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+  }
 
+  .main {
     display: flex;
     flex-direction: column;
     justify-content: stretch;
     padding: 1em;
     background-color: #c4c4c4;
+    flex-grow: 1;
+  }
 
+  #message-info {
+    min-width: 30%;
   }
 
   .messages {

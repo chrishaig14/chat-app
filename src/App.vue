@@ -74,7 +74,7 @@ export default {
       this.currentChat = chatId
     },
     login (id) {
-      this.socket.emit('login', id, this.callAfterLogin)
+      this.socket.emit('login', id)
       this.currentUser = id
     },
     sendMessage (m) {

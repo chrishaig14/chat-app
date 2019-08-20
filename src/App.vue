@@ -41,9 +41,10 @@
 import Signup from '@/components/Signup'
 import Login from '@/components/Login'
 import ChatView from '@/components/ChatView'
-import io from 'socket.io-client'
+// import io from 'socket.io-client'
 import NewChat from './components/NewChat'
 
+let serverUrl = 'http://localhost:8888'
 let sqn = 0
 export default {
   name: 'App',
@@ -55,107 +56,129 @@ export default {
       messages: [],
       chats: {},
       currentChat: '',
-      socket: io('localhost:3000'),
+      // socket: io('localhost:3000'),
       suggestions: []
     }
   },
   methods: {
     suggestUsers (str) {
-      this.socket.emit('suggest:users', str, (result) => {
-        this.suggestions = result
-      })
+      // this.socket.emit('suggest:users', str, (result) => {
+      //   this.suggestions = result
+      // })
     },
     markRead (data) {
-      this.socket.emit('mark:read', data)
+      // this.socket.emit('mark:read', data)
     },
-    newChat (chat) {
-      this.socket.emit('new:chat', chat)
-      this.show_new_chat = false
+    async newChat (chat) {
+      let response = await fetch(serverUrl + '/chats', {
+        method: 'POST',
+        headers: {
+          'Authorization': this.currentUser,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(chat)
+      })
+      if (response.ok) {
+        console.log('CREATED NEW CHAT OK!')
+      } else {
+        console.log('ERROR CREATING NEW CHAT!')
+      }
+      // this.socket.emit('new:chat', chat)
+      // this.show_new_chat = false
     },
-    newUser (user) {
-      this.socket.emit('new:user', user)
+    async newUser (user) {
+      // this.socket.emit('new:user', user)
+      let response = await fetch(serverUrl + '/users', {
+        // mode: 'no-cors',
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username: user})
+      })
+      if (response.ok) {
+        console.log('CREATED USER OK!')
+      } else {
+        console.log('ERROR CREATING USER!')
+      }
+
     },
     openChat (chatId) {
       this.currentChat = chatId
     },
-    getAllChats () {
-      this.socket.emit('get:all:chats', (m) => {
-        let chats = m.chats
-        for (let chatId in chats) {
-          let hasNew = false
-          let chat = chats[chatId]
-          chat.newMessages = false
-          for (let msg of chat.messages) {
-            if (!msg.read.includes(this.currentUser)) {
-              chat.newMessages = true
-              hasNew = true
-              break
-            }
-          }
-          if (hasNew) {
-          } else {
-          }
-        }
-        this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(chats)))
-      })
+    async getAllChats () {
+      let response = await fetch(serverUrl + '/chats', {headers: {'Authorization': this.currentUser}})
+      if (response.ok) {
+        response = await response.json()
+        console.log('GOT CHATS: ', response)
+        this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(response)))
+      } else {
+        console.log('ERROR GETTING CHATS: ', response)
+      }
     },
-    login (id) {
-      this.socket.emit('login', id, () => {
+    async login (id) {
+      let response = await fetch(serverUrl + '/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username: id})
+      })
+      if (response.ok) {
         this.currentUser = id
+        console.log('LOGGED IN OK!')
         this.getAllChats()
-      })
+      } else {
+        console.log('ERROR LOGGING IN!')
+      }
     },
-    sendMessage (m) {
-      this.socket.emit('send:message', {
-        sqn: sqn,
-        payload: {
-          chatId: this.currentChat,
-          content: m
-        }
+    async sendMessage (chatId, message) {
+      let response = await fetch(serverUrl + '/chats/' + chatId + '/messages', {
+        method: 'POST',
+        headers: {
+          'Authorization': this.currentUser,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({'message': message})
       })
-      this.chats[this.currentChat].messages.push({
-        user: this.currentUser,
-        content: m,
-        ack: false,
-        sqn: sqn
-      })
-      sqn++
+      if (response.ok) {
+        response = await response.json()
+        console.log('SENT MESSAGE OK!')
+      } else {
+        console.log('ERROR SENDING MESSAGE OK!')
+      }
     }
   },
   mounted () {
-    this.socket.on('chat', (m) => {
-      m.messages = m.messages.map(msg => ({
-        ...msg, ack: true
-      }))
-      this.chats[m.chatId].messages = m.messages
-      this.chats[m.chatId].newMessages = true
-    })
-    this.socket.on('new:message', (m) => {
-      this.chats[m.chatId].messages.push(m.message)
-      this.chats[m.chatId].newMessages = true
-    })
-    this.socket.on('ack:message', (m) => {
-      let chats = JSON.parse(JSON.stringify(this.chats))
-      // for (let msgRead of m.messagesRead) {
-      for (let i = 0; i < chats[m.chatId].messages.length; i++) {
-        if (chats[m.chatId].messages[i].sqn === m.sqn) {
-          chats[m.chatId].messages[i] = m.message
-        }
-      }
-      this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(chats)))
-    })
-    this.socket.on('ack:read', (m) => {
-      let chats = JSON.parse(JSON.stringify(this.chats))
-      for (let msgRead of m.messagesRead) {
-        for (let i = 0; i < chats[m.chatId].messages.length; i++) {
-          if (chats[m.chatId].messages[i].messageId === msgRead.messageId) {
-            chats[m.chatId].messages[i].read = msgRead.read
-          }
-        }
-      }
-      chats[m.chatId].newMessages = false
-      this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(chats)))
-    })
+    // this.socket.on('chat', (m) => {
+    //   m.messages = m.messages.map(msg => ({
+    //     ...msg, ack: true
+    //   }))
+    //   this.chats[m.chatId].messages = m.messages
+    //   this.chats[m.chatId].newMessages = true
+    // })
+    // this.socket.on('new:message', (m) => {
+    //   this.chats[m.chatId].messages.push(m.message)
+    //   this.chats[m.chatId].newMessages = true
+    // })
+    // this.socket.on('ack:message', (m) => {
+    //   let chats = JSON.parse(JSON.stringify(this.chats))
+    //   for (let msgRead of m.messagesRead) {
+    // for (let i = 0; i < chats[m.chatId].messages.length; i++) {
+    //   if (chats[m.chatId].messages[i].sqn === m.sqn) {
+    //     chats[m.chatId].messages[i] = m.message
+    //   }
+    // }
+    // this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(chats)))
+    // })
+    // this.socket.on('ack:read', (m) => {
+    //   let chats = JSON.parse(JSON.stringify(this.chats))
+    //   for (let msgRead of m.messagesRead) {
+    //     for (let i = 0; i < chats[m.chatId].messages.length; i++) {
+    //       if (chats[m.chatId].messages[i].messageId === msgRead.messageId) {
+    //         chats[m.chatId].messages[i].read = msgRead.read
+    //       }
+    //     }
+    //   }
+    //   chats[m.chatId].newMessages = false
+    //   this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(chats)))
+    // })
   },
   updated () {
     let c = this.chats[this.currentChat].messages

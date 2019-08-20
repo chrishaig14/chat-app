@@ -69,7 +69,12 @@ export default {
       this.socket.emit('mark:read', data)
     },
     newChat (chat) {
-      this.socket.emit('new:chat', chat)
+      this.socket.emit('new:chat', chat, (chatObj) => {
+        console.log('[] New chat created: ', chatObj)
+        let obj = {}
+        obj[chatObj.chatId] = chatObj
+        this.chats = Object.assign({}, this.chats, obj)
+      })
       this.show_new_chat = false
     },
     newUser (user) {
@@ -80,7 +85,8 @@ export default {
     },
     getAllChats () {
       this.socket.emit('get:all:chats', (m) => {
-        let chats = m.chats
+        let chats = m
+        console.log('[] Got chats: ', chats)
         for (let chatId in chats) {
           let hasNew = false
           let chat = chats[chatId]
@@ -102,6 +108,7 @@ export default {
     login (id) {
       this.socket.emit('login', id, () => {
         this.currentUser = id
+        console.log('[] User log in: ', id)
         this.getAllChats()
       })
     },

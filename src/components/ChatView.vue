@@ -45,7 +45,7 @@ export default {
       console.log('clicked on message id: ', messageId)
     },
     handleSubmit () {
-      this.$emit('send:message', this.message)
+      this.$emit('send:message', this.chatId, this.message)
       this.message = ''
     },
     markAllAsRead () {

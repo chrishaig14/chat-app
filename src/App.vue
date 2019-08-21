@@ -6,7 +6,7 @@
       <p>Current user: <span style="font-weight: bold">{{currentUser}}</span>
       </p>
       <div>
-        <h2>Chats</h2>
+        <h2>CHATS</h2>
         <button @click="show_new_chat=true" style="margin-bottom: 1em;">Create
           new chat
         </button>

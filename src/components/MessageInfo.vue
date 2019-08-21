@@ -25,9 +25,11 @@ export default {
     color: white;
     display: flex;
     flex-direction: column;
+    padding: 1em;
   }
 
   .user-item {
+    padding: 0.5em;
     margin: 1em;
     background-color: #e7ffa3;
     color: black;

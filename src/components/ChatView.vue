@@ -12,10 +12,8 @@
         <button>Send!</button>
       </form>
     </div>
-    <!--    <div style="width: 100px;height:100px; background-color:blue;"></div>-->
     <message-info @close='messageInfo=false' v-if="messageInfo"
                   :message="messages.filter(msg => msg.messageId === messageInfoId)[0]"/>
-    <!--    <span v-if="messageInfo" style="color:blue">IS TRUE!</span>-->
   </div>
 </template>
 

@@ -133,27 +133,10 @@ export default {
     }
   },
   mounted () {
-    this.socket.on('chat', (m) => {
-      m.messages = m.messages.map(msg => ({
-        ...msg, ack: true
-      }))
-      this.chats[m.chatId].messages = m.messages
-      this.chats[m.chatId].newMessages = true
-    })
     this.socket.on('new:message', (m) => {
       console.log('[] Received new message: ', m)
       this.chats[m.chatId].messages.push(m.message)
       this.chats[m.chatId].newMessages = true
-    })
-    this.socket.on('ack:message', (m) => {
-      let chats = JSON.parse(JSON.stringify(this.chats))
-      // for (let msgRead of m.messagesRead) {
-      for (let i = 0; i < chats[m.chatId].messages.length; i++) {
-        if (chats[m.chatId].messages[i].sqn === m.sqn) {
-          chats[m.chatId].messages[i] = m.message
-        }
-      }
-      this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(chats)))
     })
     this.socket.on('ack:read', (m) => {
       console.log('[] Marking as read: ', m)
@@ -168,9 +151,6 @@ export default {
       chats[m.chatId].newMessages = false
       this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(chats)))
     })
-  },
-  updated () {
-    let c = this.chats[this.currentChat].messages
   }
 }
 </script>

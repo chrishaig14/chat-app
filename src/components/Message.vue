@@ -5,11 +5,12 @@
     <div class="msg-user" style="color:#777; font-style: italic">
       {{message.user}}
     </div>
-    <div>
+    <div style="margin-bottom: 0.5em; margin-top:0.5em;">
       {{message.content}}
     </div>
-    {{message.hasOwnProperty('timestamp')?new
-    Date(message.timestamp).toLocaleString():'Sending'}}
+    <div style="color:gray">{{message.hasOwnProperty('timestamp')?new
+      Date(message.timestamp).toLocaleString():'Sending'}}
+    </div>
   </div>
 </template>
 

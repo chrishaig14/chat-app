@@ -2,8 +2,10 @@
   <div id="chat-view">
     <div class="main">
       <div ref="msglist" class="messages">
-        <message v-for="msg in messages" :key="msg.id" :message="msg"
-                 :current-user="currentUser" @message:click="clickMessage"/>
+        <message
+          :class="msg.messageId === messageInfoId && messageInfo?'selected':'not-selected'"
+          v-for="msg in messages" :key="msg.id" :message="msg"
+          :current-user="currentUser" @message:click="clickMessage"/>
       </div>
       <form @submit.prevent="handleSubmit">
         <input type="text" v-model="message">
@@ -49,7 +51,7 @@ export default {
       this.message = ''
     },
     markAllAsRead () {
-      // this.$refs.msglist.scrollTop = this.$refs.msglist.scrollHeight
+
       let readMsgs = []
 
       for (let msg of this.messages) {
@@ -64,6 +66,7 @@ export default {
   },
 
   mounted () {
+    this.$refs.msglist.scrollTop = this.$refs.msglist.scrollHeight
     this.markAllAsRead()
   },
 
@@ -143,4 +146,13 @@ export default {
   form input {
     flex-grow: 1;
   }
+
+  .selected {
+    border: solid 2px darkgreen;
+  }
+
+  .not-selected {
+    border: solid 2px transparent;
+  }
+
 </style>

@@ -53,7 +53,7 @@ export default {
       let readMsgs = []
 
       for (let msg of this.messages) {
-        if (!msg.read.includes(this.currentUser)) {
+        if (msg.user !== this.currentUser && !msg.read.includes(this.currentUser)) {
           readMsgs.push(msg.messageId)
         }
       }

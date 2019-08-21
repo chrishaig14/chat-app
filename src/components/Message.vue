@@ -8,7 +8,8 @@
     <div>
       {{message.content}}
     </div>
-    {{(new Date(message.timestamp)).toLocaleString()}}
+    {{message.hasOwnProperty('timestamp')?new
+    Date(message.timestamp).toLocaleString():'Sending'}}
   </div>
 </template>
 

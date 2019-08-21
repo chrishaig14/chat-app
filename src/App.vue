@@ -112,21 +112,24 @@ export default {
         this.getAllChats()
       })
     },
-    sendMessage (m) {
-      this.socket.emit('send:message', {
-        sqn: sqn,
-        payload: {
-          chatId: this.currentChat,
-          content: m
-        }
-      })
-      this.chats[this.currentChat].messages.push({
+    sendMessage (chatId, message) {
+      console.log('[] Message to be sent to chat ', chatId, ' : ', message)
+      let messageObj = {
         user: this.currentUser,
-        content: m,
-        ack: false,
-        sqn: sqn
+        content: message
+      }
+      this.chats[chatId].messages.push(messageObj)
+      let index = this.chats[chatId].messages.length - 1
+      this.socket.emit('send:message', {
+        chatId: chatId,
+        content: message
+      }, (msjObj) => {
+        // messageObj = Object.assign({}, messageObj, msjObj)
+        console.log('[] Acknowledge message sent: ', msjObj)
+        let chats = JSON.parse(JSON.stringify(this.chats))
+        chats[chatId].messages[index] = msjObj
+        this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(chats)))
       })
-      sqn++
     }
   },
   mounted () {
@@ -138,6 +141,7 @@ export default {
       this.chats[m.chatId].newMessages = true
     })
     this.socket.on('new:message', (m) => {
+      console.log('[] Received new message: ', m)
       this.chats[m.chatId].messages.push(m.message)
       this.chats[m.chatId].newMessages = true
     })
@@ -152,6 +156,7 @@ export default {
       this.chats = Object.assign({}, this.chats, JSON.parse(JSON.stringify(chats)))
     })
     this.socket.on('ack:read', (m) => {
+      console.log('[] Marking as read: ', m)
       let chats = JSON.parse(JSON.stringify(this.chats))
       for (let msgRead of m.messagesRead) {
         for (let i = 0; i < chats[m.chatId].messages.length; i++) {

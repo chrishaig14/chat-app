@@ -1,21 +1,22 @@
-# chat-app
+# Chat app
 
-> Chat app made with Vue.js
+Simple chat app
 
-## Build Setup
+Server: https://github.com/chrishaig14/chat-server
 
-``` bash
-# install dependencies
-npm install
+## Features
+* Create new simple (one user) or group chats (multiple users). Group chats have a custom name.
+* Real-time messaging using sockets.
+* Click on message and see who has read it.
 
-# serve with hot reload at localhost:8080
-npm run dev
+## Back end
+* Node
+* MongoDB
+* Socket.IO
 
-# build for production with minification
-npm run build
+## Front end
+* VueJS
+* Socket.IO
 
-# build for production and view the bundle analyzer report
-npm run build --report
-```
+## Screenshots
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
